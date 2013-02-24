@@ -1,4 +1,4 @@
-#include "src/ACO.h"
+#include "../src/ACO.h"
 #include <iostream>
 #include <vector>
 
@@ -6,7 +6,10 @@ using namespace std;
 
 double fitness(vector <double> cords)
 {
-    return cords[1] * cords[1] - (cords[0] - 5) * (cords[0] - 5);
+    double x = cords[0];
+    double y = cords[1];
+
+    return y * y - (x - 5) * (x - 5);
 }
 
 int main(int argc, char** argv)
@@ -19,11 +22,12 @@ int main(int argc, char** argv)
     config.limits = limits;
     config.fitness = fitness;
     config.count_of_ants = 100;
-    config.max_iterations = 50;
+    config.max_iterations = 500;
 
-	ACO * aco = new ACO(config);
+    ACO * aco = new ACO(config);
+    vector <double> best = aco->solve();
 
-	aco->solve();
+    cout << "x = " << best[0] << endl << "y = " << best[1] << endl;
 
-	return 0;
+    return 0;
 }

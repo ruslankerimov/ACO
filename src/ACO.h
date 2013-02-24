@@ -24,12 +24,13 @@ private:
     ACOconfig config;
     int dimension;
     vector <double> get_random_cords();
+    vector <double> get_random_neighbor_cords(vector <double>);
 
     static double random_double(double, double);
     static bool is_rand_inited;
 public:
     ACO(ACOconfig);
-    void solve();
+    vector <double> solve();
 };
 
 #endif

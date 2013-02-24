@@ -69,14 +69,15 @@ CXXFLAGS := $(CXXFLAGS) $(DEFS)
 #****************************************************************************
 
 SRC_DIR         := src/
-SRCS            := $(wildcard $(SRC_DIR)*.cpp) main.cpp
-OBJS            := $(patsubst %.cpp, %.o, $(patsubst %.c, %.o, $(SRCS)))
+EXAMPLES_DIR    := examples/
+SRCS            := $(wildcard $(SRC_DIR)*.cpp) $(wildcard $(EXAMPLES_DIR)*.cpp)
+OBJS            := $(patsubst %.cpp, %.o, $(SRCS))
 
 #****************************************************************************
 # Targets of the build
 #****************************************************************************
  
-OUTPUT := main
+OUTPUT := $(patsubst %.cpp, %, $(wildcard $(EXAMPLES_DIR)*.cpp))
 all: $(OUTPUT)
 
 #****************************************************************************
@@ -107,5 +108,5 @@ clean:
 # Dependencies
 #****************************************************************************
 
-main.o: $(SRC_DIR)ACO.h
+$(OUTPUT): $(SRC_DIR)ACO.h
 $(SRC_DIR)ACO.h: $(SRC_DIR)ACOconfig.h

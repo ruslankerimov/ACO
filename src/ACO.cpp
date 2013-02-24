@@ -9,155 +9,7 @@ ACO::ACO(ACOconfig config)
     dimension = config.limits.size(); // @todo
 }
 
-
-/*
-
-var options = {
-    ant_count : 20,
-    good_ants : 4,
-    alpha : 0.9,
-    tau0 : 1,
-    propability_selecting : 0.9,
-    bad_ants : 3,
-    ro : 0.7,
-    delta_r : 0.1
-};
-
-function Ant(point) {
-    this._point = point || this._getRandomPoint();
-    this._tauX = options.tau0;
-    this._tauY = options.tau0;
-    this._value = this._getValue();
-}
-
-Ant.prototype._getValue = function() {
-    var point = this._point;
-
-    return point.x * point.x + point.y * point.y;
-};
-
-Ant.prototype._getRandomPoint = function() {
-    return {
-        x : this._getRandom(-1000, 1000),
-        y : this._getRandom(-1000, 1000)
-    };
-};
-
-Ant.prototype._getRandom = function(a, b) {
-    return Math.random() * (b - a) + a;
-};
-
-Ant.prototype.setTau = function() {
-
-};
-
-Ant.prototype.valueOf = function() {
-    return this._value;
-};
-
-
-
-function main() {
-    var i, size, j, k,
-        ants = [],
-        p,
-        totalTau;
-
-    for (i = 0, size = options.ant_count; i < size; ++i) {
-        ants.push(new Ant());
-    }
-
-    ants.sort(function(a, b) {
-        return b - a;
-    });
-
-    for (i = 0, size = options.good_ants - 1; i < size; ++i) {
-        ants[i]._tauX += options.alpha * options.tau0 * (options.good_ants - i - 1);
-        ants[i]._tauY += options.alpha * options.tau0 * (options.good_ants - i - 1);
-    }
-
-    for (k = 0; k < 500; ++k) {
-        totalTau = { x : 0, y : 0 };
-        for (i = 0, size = options.ant_count; i < size; ++i) {
-            totalTau.x += ants[i]._tauX;
-            totalTau.y += ants[i]._tauY;
-        }
-
-        for (i = 0, size = options.ant_count; i < size; ++i) {
-            ants[i]._pXmin = i === 0 ? 0 : ants[i - 1]._pXmax;
-            ants[i]._pXmax = ants[i]._pXmin + ants[i]._tauX / totalTau.x;
-
-            ants[i]._pYmin = i === 0 ? 0 : ants[i - 1]._pYmax;
-            ants[i]._pYmax = ants[i]._pYmin + ants[i]._tauY / totalTau.y;
-        }
-
-        for (i = 1, size = options.ant_count; i < size; ++i) {
-            p = Math.random();
-            if (p < options.propability_selecting) {
-                p = Math.random();
-                for (j = 0; j < options.ant_count; ++j) {
-                    if (p >= ants[j]._pXmin && p < ants[j]._pXmax) {
-                        ants[i]._point.x = ants[j]._point.x;
-                    }
-                }
-
-                p = Math.random();
-                for (j = 0; j < options.ant_count; ++j) {
-                    if (p >= ants[j]._pYmin && p < ants[j]._pYmax) {
-                        ants[i]._point.y = ants[j]._point.y;
-                    }
-                }
-
-                ants[i]._value = ants[i]._getValue();
-            }
-        }
-
-        ants.sort(function(a, b) {
-            return -b + a;
-        });
-
-        for (i = options.ant_count - 1; i > options.ant_count - options.bad_ants - 1; --i) {
-            ants[i]._point = ants[i]._getRandomPoint();
-            ants[i]._value = ants[i]._getValue();
-        }
-
-        ants.sort(function(a, b) {
-            return a - b;
-        });
-
-        for (i = 0; i < options.ant_count; ++i) {
-            ants[i]._tauX *= options.ro;
-            ants[i]._tauY *= options.ro;
-
-            if (i < options.good_ants - 1) {
-                ants[i]._tauX += options.alpha * options.tau0 * (options.good_ants - i - 1);
-                ants[i]._tauY += options.alpha * options.tau0 * (options.good_ants - i - 1);
-            }
-
-
-        }
-
-        var old_value = ants[0]._value,
-            old_x = ants[0]._point.x,
-            old_y = ants[0]._point.y;
-
-        ants[0]._point.x = ants[0]._getRandom(old_x - options.delta_r, old_x + options.delta_r);
-        ants[0]._point.y = ants[0]._getRandom(old_y - options.delta_r, old_y + options.delta_r);
-        ants[0]._value = ants[0]._getValue();
-        if (ants[0]._value > old_value) {
-            ants[0]._point.x = old_x;
-            ants[0]._point.y = old_y;
-            ants[0]._value = ants[0]._getValue();
-        }
-    }
-
-    console.log(JSON.stringify(ants[0], null, 4));
-}
-
-
-*/
-
-void ACO::solve()
+vector <double> ACO::solve()
 {
     vector <Ant *> ants;
 
@@ -169,16 +21,16 @@ void ACO::solve()
 
     sort(ants.begin(), ants.end(), Ant::compare);
 
-    for (int j = 0; j < config.count_of_good_ants; ++j)
-    {
-        for (int k = 0; k < dimension; ++k)
-        {
-            (ants[j]->tau)[k] += config.alpha * config.tau_0 * (config.count_of_good_ants - j - 1); // @todo
-        }
-    }
-
     for (int i = 0; i < config.max_iterations; ++i)
     {
+        for (int j = 0; j < config.count_of_good_ants; ++j)
+        {
+            for (int k = 0; k < dimension; ++k)
+            {
+                (ants[j]->tau)[k] += config.alpha * config.tau_0 * (config.count_of_good_ants - j - 1); // @todo
+            }
+        }
+
         vector <double> total_tau;
         for (int j = 0; j < dimension; ++j)
         {
@@ -246,23 +98,20 @@ void ACO::solve()
             }
         }
 
-//        var old_value = ants[0]._value,
-//            old_x = ants[0]._point.x,
-//            old_y = ants[0]._point.y;
-//
-//        ants[0]._point.x = ants[0]._getRandom(old_x - options.delta_r, old_x + options.delta_r);
-//        ants[0]._point.y = ants[0]._getRandom(old_y - options.delta_r, old_y + options.delta_r);
-//        ants[0]._value = ants[0]._getValue();
-//        if (ants[0]._value > old_value) {
-//            ants[0]._point.x = old_x;
-//            ants[0]._point.y = old_y;
-//            ants[0]._value = ants[0]._getValue();
-//        }
+        double old_value = ants[0]->value;
+        vector <double> old_cords = ants[0]->cords;
 
+        ants[0]->cords = get_random_neighbor_cords(ants[0]->cords);
+        ants[0]->value = config.fitness(ants[0]->cords);
 
+        if (old_value > ants[0]->value)
+        {
+            ants[0]->cords = old_cords;
+            ants[0]->value = old_value;
+        }
     }
 
-    cout << "x = " << ants[0]->cords[0] << endl << "y = " << ants[0]->cords[1] << endl;
+    return ants[0]->cords;
 }
 
 bool ACO::is_rand_inited = false;
@@ -286,6 +135,31 @@ vector <double> ACO::get_random_cords()
     {
         double min = config.limits[i].first;
         double max = config.limits[i].second;
+
+        new_cords.push_back(random_double(min, max));
+    }
+
+    return new_cords;
+}
+
+vector <double> ACO::get_random_neighbor_cords(vector <double> cords)
+{
+    vector <double> new_cords;
+
+    for (int i = 0; i < dimension; ++i)
+    {
+        double min = cords[i] - config.delta_r; // config.limits[i].first;
+        double max = cords[i] + config.delta_r; // config.limits[i].second;
+
+        if (min < config.limits[i].first)
+        {
+            min = config.limits[i].first;
+        }
+
+        if (max > config.limits[i].second)
+        {
+            max = config.limits[i].second;
+        }
 
         new_cords.push_back(random_double(min, max));
     }
