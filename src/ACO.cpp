@@ -1,4 +1,3 @@
-#include <iostream>
 #include "ACO.h"
 
 using namespace std;
@@ -6,7 +5,7 @@ using namespace std;
 ACO::ACO(ACOconfig config)
 {
     ACO::config = config;
-    dimension = config.limits.size(); // @todo
+    dimension = config.limits.size();
 }
 
 vector <double> ACO::solve()
@@ -16,10 +15,11 @@ vector <double> ACO::solve()
     for (int i = 0; i < config.count_of_ants; ++i)
     {
         vector <double> cords = get_random_cords();
-        ants.push_back(new Ant(cords, config.fitness(cords)));
+        ants.push_back(
+            new Ant(cords, vector <double> (dimension, config.tau_0), config.fitness(cords)));
     }
 
-    sort(ants.begin(), ants.end(), Ant::compare);
+    sort(ants.begin(), ants.end(), compare);
 
     for (int i = 0; i < config.max_iterations; ++i)
     {
@@ -31,11 +31,7 @@ vector <double> ACO::solve()
             }
         }
 
-        vector <double> total_tau;
-        for (int j = 0; j < dimension; ++j)
-        {
-            total_tau.push_back(0);
-        }
+        vector <double> total_tau (dimension, 0);
         for (int j = 0; j < config.count_of_ants; ++j)
         {
             for (int k = 0; k < dimension; ++k)
@@ -44,26 +40,30 @@ vector <double> ACO::solve()
             }
         }
 
+        vector < vector < pair <double, double> > > p_ants;
         for (int j = 0; j < config.count_of_ants; ++j)
         {
+            vector < pair <double, double> > p_ant;
             for (int k = 0; k < dimension; ++k)
             {
-                (ants[j]->pMin)[k] = j == 0 ? 0 : (ants[j - 1]->pMax)[k];
-                (ants[j]->pMax)[k] = (ants[j]->pMin)[k] + (ants[j]->tau)[k] / total_tau[k];
+                double p_min = j == 0 ? 0 : p_ants[j - 1][k].second;
+                double p_max = p_min + (ants[j]->tau)[k] / total_tau[k];
+                p_ant.push_back(make_pair(p_min, p_max));
             }
+            p_ants.push_back(p_ant);
         }
 
         for (int j = 1; j < config.count_of_ants; ++j)
         {
-            if (random_double(0, 1) < config.propability_selecting)
+            if (get_random_double(0, 1) < config.propability_selecting)
             {
                 for (int k = 0; k < dimension; ++k)
                 {
-                    double p = random_double(0, 1);
+                    double p = get_random_double(0, 1);
 
                     for (int m = 0; m < config.count_of_ants; ++m)
                     {
-                        if (p >= (ants[m]->pMin)[k] && p < (ants[m]->pMax)[k])
+                        if (p >= p_ants[m][k].first && p < p_ants[m][k].second)
                         {
                             (ants[j]->cords)[k] = (ants[m]->cords)[k];
                             break;
@@ -75,7 +75,7 @@ vector <double> ACO::solve()
             }
         }
 
-        sort(ants.begin(), ants.end(), Ant::compare);
+        sort(ants.begin(), ants.end(), compare);
 
         for (int j = config.count_of_ants - 1; j > config.count_of_ants - config.count_of_bed_ants - 1; --j)
         {
@@ -83,7 +83,7 @@ vector <double> ACO::solve()
             ants[j]->value = config.fitness(ants[j]->cords);
         }
 
-        sort(ants.begin(), ants.end(), Ant::compare);
+        sort(ants.begin(), ants.end(), compare);
 
         for (int j = 0; j < config.count_of_ants; ++j)
         {
@@ -116,7 +116,7 @@ vector <double> ACO::solve()
 
 bool ACO::is_rand_inited = false;
 
-double ACO::random_double(double min, double max)
+double ACO::get_random_double(double min, double max)
 {
     if ( ! is_rand_inited)
     {
@@ -136,7 +136,7 @@ vector <double> ACO::get_random_cords()
         double min = config.limits[i].first;
         double max = config.limits[i].second;
 
-        new_cords.push_back(random_double(min, max));
+        new_cords.push_back(get_random_double(min, max));
     }
 
     return new_cords;
@@ -148,8 +148,8 @@ vector <double> ACO::get_random_neighbor_cords(vector <double> cords)
 
     for (int i = 0; i < dimension; ++i)
     {
-        double min = cords[i] - config.delta_r; // config.limits[i].first;
-        double max = cords[i] + config.delta_r; // config.limits[i].second;
+        double min = cords[i] - config.delta_r;
+        double max = cords[i] + config.delta_r;
 
         if (min < config.limits[i].first)
         {
@@ -161,32 +161,20 @@ vector <double> ACO::get_random_neighbor_cords(vector <double> cords)
             max = config.limits[i].second;
         }
 
-        new_cords.push_back(random_double(min, max));
+        new_cords.push_back(get_random_double(min, max));
     }
 
     return new_cords;
 }
 
-ACO::Ant::Ant(vector <double> cords, double value)
+ACO::Ant::Ant(vector <double> cords, vector <double> tau, double value)
 {
-    vector <double> new_tau;
-    vector <double> new_pMax;
-    vector <double> new_pMin;
-    for (int i = 0, size = cords.size(); i < size; ++i)
-    {
-        new_tau.push_back(1);
-        new_pMax.push_back(0);
-        new_pMin.push_back(0);
-    }
-
     Ant::cords = cords;
     Ant::value = value;
-    Ant::tau = new_tau; // @todo optimize
-    Ant::pMax = new_pMax;
-    Ant::pMin = new_pMin;
+    Ant::tau = tau;
 }
 
-bool ACO::Ant::compare(Ant * a, Ant * b)
+bool ACO::compare(Ant * a, Ant * b)
 {
     return a->value > b->value;
 }

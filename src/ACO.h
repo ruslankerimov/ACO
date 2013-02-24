@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <algorithm>
+#include <time.h>
 #include "ACOconfig.h"
 
 using namespace std;
@@ -13,12 +14,9 @@ private:
     struct Ant
     {
         vector <double> cords;
-        vector <double> tau; // @todo rename
-        vector <double> pMin; // @todo rename
-        vector <double> pMax; // @todo rename
+        vector <double> tau;
         double value;
-        static bool compare(Ant *, Ant *);
-        Ant(vector <double>, double);
+        Ant(vector <double>, vector <double>, double);
     };
 
     ACOconfig config;
@@ -26,8 +24,10 @@ private:
     vector <double> get_random_cords();
     vector <double> get_random_neighbor_cords(vector <double>);
 
-    static double random_double(double, double);
+    static double get_random_double(double, double);
     static bool is_rand_inited;
+
+    static bool compare(Ant *, Ant *);
 public:
     ACO(ACOconfig);
     vector <double> solve();
