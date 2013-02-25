@@ -1,7 +1,6 @@
 #Ant Colony Optimization
 
-There is a ACO-algorithm realisation on C++.
-http://en.wikipedia.org/wiki/Ant_colony_optimization_algorithms
+There is a [ACO-algorithm](http://en.wikipedia.org/wiki/Ant_colony_optimization_algorithms) implementation in C++.
 
 For usage you should define fitness-function, link this:
 ```c++
