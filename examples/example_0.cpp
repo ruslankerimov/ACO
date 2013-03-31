@@ -24,8 +24,8 @@ int main(int argc, char** argv)
     config.count_of_ants = 100;
     config.max_iterations = 500;
 
-    ACO * aco = new ACO(config);
-    vector <double> best = aco->solve();
+    ACO * algorithm = new ACO(config);
+    vector <double> best = algorithm->solve();
 
     cout << "x = " << best[0] << endl << "y = " << best[1] << endl;
 

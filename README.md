@@ -2,7 +2,7 @@
 
 There is a [ACO-algorithm](http://en.wikipedia.org/wiki/Ant_colony_optimization_algorithms) implementation in C++.
 
-For usage you should define fitness-function, link this:
+For usage you should define fitness-function, like this:
 ```c++
 double fitness(vector <double> cords)
 {
